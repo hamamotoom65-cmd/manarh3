@@ -261,7 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // التأكد من أن كل الأسئلة تحتوي على تصنيف
     ensureQuestionCategories();
 
-    // تعيين الشاشة النشطة الأولى
+    // افتح كل الحصص: ضع الحالة 'current' لجميع الحصص لتكون مفعلة
+    unlockAllLessons();
+    // تحميل آخر تقدم محفوظ وحالة تهيئة المسار
+    loadLastProgress();
+    loadPathInitialized();
+
+    // تعيين الشاشة النشطة الأولى (سيستعيد المسار تلقائياً فقط بعد الإنشاء الأول)
     switchScreen('path-screen');
     
     // تهيئة التنقل السفلي
@@ -276,6 +282,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // إضافة تأثيرات تفاعلية
     addInteractiveEffects();
 });
+
+// مفتاح التخزين للتقدم
+const PROGRESS_KEY = 'manaraProgress_v1';
+let lastProgress = null;
+// مفتاح وعلَم يحدد ما إذا تم إنشاء/تهيئة المسار سابقاً
+const PATH_INIT_KEY = 'manaraPathInit_v1';
+let pathInitialized = false;
+
+function saveLastProgress(unitId, lessonId) {
+    try {
+        const payload = { unitId: String(unitId), lessonId: String(lessonId) };
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify(payload));
+        lastProgress = payload;
+    } catch (e) {
+        console.warn('saveLastProgress failed', e);
+    }
+}
+
+function loadLastProgress() {
+    try {
+        const raw = localStorage.getItem(PROGRESS_KEY);
+        if (raw) {
+            lastProgress = JSON.parse(raw);
+        }
+    } catch (e) {
+        lastProgress = null;
+    }
+}
+
+function loadPathInitialized() {
+    try {
+        const raw = localStorage.getItem(PATH_INIT_KEY);
+        pathInitialized = raw === '1';
+    } catch (e) {
+        pathInitialized = false;
+    }
+}
+
+function setPathInitialized() {
+    try {
+        localStorage.setItem(PATH_INIT_KEY, '1');
+        pathInitialized = true;
+    } catch (e) {
+        console.warn('setPathInitialized failed', e);
+    }
+}
 
 // تأكد من أن كل سؤال في `lessonsData` و `examsData` يحتوي على حقل `category`
 function ensureQuestionCategories() {
@@ -341,6 +393,23 @@ function ensureQuestionCategories() {
         }
     } catch (e) {
         console.warn('ensureQuestionCategories failed', e);
+    }
+}
+
+// اجعل جميع الحصص مفعلة (غير مقفلة)
+function unlockAllLessons() {
+    try {
+        for (const unitId in lessonsData) {
+            const lessons = lessonsData[unitId];
+            if (!Array.isArray(lessons)) continue;
+            lessons.forEach(lesson => {
+                // ضع الحالة 'current' إذا كانت مقفلة
+                if (!lesson || typeof lesson !== 'object') return;
+                lesson.status = 'current';
+            });
+        }
+    } catch (e) {
+        console.warn('unlockAllLessons failed', e);
     }
 }
 
@@ -512,6 +581,14 @@ function ensureQuestionCategories() {
 
 // تبديل الشاشات
 function switchScreen(screenId) {
+    // إذا المستخدم طلب شاشة المسار:
+    if (screenId === 'path-screen') {
+        // علامة التهيئة تحتفظ بأنها تمّت عند أول زيارة فعلية للمسار
+        if (!pathInitialized) {
+            setPathInitialized();
+        }
+    }
+    
     // إخفاء جميع الشاشات
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
@@ -592,7 +669,7 @@ function populateLessons() {
                 }
                 
                 lessonsHTML += `
-                    <div class="lesson-item" onclick="viewLesson(${unitId}, ${lesson.id})">
+                    <div class="lesson-item" data-lesson="${lesson.id}" onclick="viewLesson(${unitId}, ${lesson.id})">
                         <div class="lesson-header">
                             <div class="lesson-title">
                                 <i class="fas fa-video"></i> ${lesson.title}
@@ -680,6 +757,8 @@ function populateExams() {
 // بدء الامتحان
 function startExam(exam) {
     currentExamId = exam.id;
+    // associate the exam with its unit so we can progress to the next unit after finishing
+    currentUnitId = String(exam.id);
     
     // تعيين معلومات الامتحان في الرأس
     document.getElementById('exam-title-header').textContent = exam.title;
@@ -863,6 +942,34 @@ function displayExamSummary(correct, answered, totalQuestions, results, sessionP
     if (existingSummary) {
         existingSummary.remove();
     }
+    // أزرار تتابع بعد الامتحان
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'exam-summary-actions';
+
+    // زر للذهاب للوحدة التالية (إن وُجد)
+    const nextUnitId = parseInt(currentUnitId, 10) + 1;
+    if (lessonsData[String(nextUnitId)] || lessonsData[nextUnitId]) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn-primary';
+        nextBtn.textContent = 'الانتقال للوحدة التالية';
+        nextBtn.addEventListener('click', () => {
+            // افتح أول حصة من الوحدة التالية
+            const unitKey = lessonsData[String(nextUnitId)] ? String(nextUnitId) : nextUnitId;
+            const lessons = lessonsData[unitKey];
+            if (lessons && lessons.length > 0) {
+                const firstLessonId = lessons[0].id;
+                viewLesson(unitKey, firstLessonId);
+            }
+        });
+        actionsDiv.appendChild(nextBtn);
+    } else {
+        const doneMsg = document.createElement('div');
+        doneMsg.className = 'results-message';
+        doneMsg.textContent = '🎉 لقد أكملت كل الوحدات المتاحة.';
+        actionsDiv.appendChild(doneMsg);
+    }
+
+    summaryContainer.appendChild(actionsDiv);
     examContent.appendChild(summaryContainer);
     
     // تمرير سلس لأسفل الملخص
@@ -921,7 +1028,13 @@ function toggleGrammarDetails() {
 
 // الرجوع للشاشة الرئيسية
 function goBack() {
-    switchScreen('path-screen');
+    // عندما يضغط المستخدم زر العودة نريد عرض شاشة المسار بدلاً من استئناف الحصة تلقائياً
+    skipAutoResume = true;
+    try {
+        switchScreen('path-screen');
+    } finally {
+        skipAutoResume = false;
+    }
 }
 
 // الحصول على نص الحالة
@@ -1063,6 +1176,17 @@ function viewLesson(unitId, lessonId) {
     
     // تعبئة الأسئلة
     const questionsContainer = document.getElementById('lesson-questions');
+    // إزالة أي ملخص أو نتائج من الحصة السابقة
+    const prevSummary = document.getElementById('lesson-summary');
+    if (prevSummary) prevSummary.remove();
+    // إزالة أي عناصر ملخص عامة أو نتائج متبقية داخل حاوية الحصة
+    const lessonContentParent = questionsContainer.parentElement;
+    if (lessonContentParent) {
+        lessonContentParent.querySelectorAll('.exam-summary, #lesson-summary').forEach(n => n.remove());
+        lessonContentParent.querySelectorAll('.answer-result-inline').forEach(n => n.remove());
+    }
+    // كذلك أزل أي نتائج داخل `lesson-questions` فقط للتأكد
+    questionsContainer.querySelectorAll('.answer-result-inline').forEach(n => n.remove());
     questionsContainer.innerHTML = '';
     
     lesson.questions.forEach((question, index) => {
@@ -1092,6 +1216,15 @@ function viewLesson(unitId, lessonId) {
     
     closeLessonModal();
     switchScreen('lesson-view-screen');
+
+    // أضف فئة للانتقال تُشغل أنيميشن بصري للمستخدم
+    const lessonView = document.getElementById('lesson-view-screen');
+    lessonView.classList.remove('lesson-transition');
+    // force reflow then add class to restart animation
+    void lessonView.offsetWidth;
+    lessonView.classList.add('lesson-transition');
+    // إزالة الفئة بعد انتهاء الأنيميشن (500ms)
+    setTimeout(() => lessonView.classList.remove('lesson-transition'), 600);
 }
 
 // تسليم الحصة
@@ -1236,6 +1369,53 @@ function displayLessonSummary(correct, answered, totalQuestions, results, sessio
 
     summaryContainer.appendChild(listContainer);
 
+    // أزرار متابعة: التالي أو بدء امتحان الوحدة
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'lesson-summary-actions';
+
+    const unitKey = currentUnitId;
+    const lessons = lessonsData[unitKey];
+    // العثور على الفهرس التالي بناءً على currentLessonId
+    const curIdNum = parseInt(currentLessonId, 10);
+    let nextLesson = null;
+    if (lessons && Array.isArray(lessons)) {
+        for (let i = 0; i < lessons.length; i++) {
+            if (lessons[i].id === curIdNum) {
+                if (i + 1 < lessons.length) nextLesson = lessons[i + 1];
+                break;
+            }
+        }
+    }
+
+    if (nextLesson) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn-primary';
+        nextBtn.textContent = 'التالي';
+        nextBtn.addEventListener('click', () => {
+            viewLesson(unitKey, nextLesson.id);
+        });
+        actionsDiv.appendChild(nextBtn);
+    } else {
+        // لا يوجد درس تالي -> عرض زر بدء امتحان الوحدة (إن وُجد)
+        const examForUnit = examsData.find(ex => parseInt(ex.id, 10) === parseInt(unitKey, 10));
+        if (examForUnit && examForUnit.status !== 'locked') {
+            const examBtn = document.createElement('button');
+            examBtn.className = 'btn btn-primary';
+            examBtn.textContent = 'ابدأ امتحان الوحدة';
+            examBtn.addEventListener('click', () => {
+                startExam(examForUnit);
+            });
+            actionsDiv.appendChild(examBtn);
+        } else {
+            const doneMsg = document.createElement('div');
+            doneMsg.className = 'results-message';
+            doneMsg.textContent = 'انتهت حصص هذه الوحدة.';
+            actionsDiv.appendChild(doneMsg);
+        }
+    }
+
+    summaryContainer.appendChild(actionsDiv);
+
     const lessonContent = document.getElementById('lesson-questions').parentElement;
     const existing = document.getElementById('lesson-summary');
     if (existing) existing.remove();
@@ -1250,6 +1430,8 @@ function displayLessonSummary(correct, answered, totalQuestions, results, sessio
 let currentUnitId = null;
 let currentLessonId = null;
 let currentExamId = null;
+// علم لتخطي استئناف التقدم التلقائي (يُستخدم عند الضغط على زر العودة)
+let skipAutoResume = false;
 
 // دالة لعرض رسائل الأخطاء على الشاشة بدلاً من alert
 function showErrorMessage(message) {
@@ -1292,6 +1474,8 @@ const originalViewLesson = viewLesson;
 viewLesson = function(unitId, lessonId) {
     currentUnitId = unitId;
     currentLessonId = lessonId;
+    // احفظ التقدم قبل العرض
+    try { saveLastProgress(unitId, lessonId); } catch (e) {}
     originalViewLesson.call(this, unitId, lessonId);
 };
 
