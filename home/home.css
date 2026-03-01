@@ -1,0 +1,455 @@
+/* ===== CSS Reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2563EB;
+    --primary-light: rgba(37, 99, 235, 0.1);
+    --success: #22C55E;
+    --success-light: rgba(34, 197, 94, 0.1);
+    --background: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --border: #E2E8F0;
+    --inactive: #94A3B8;
+    --radius: 16px;
+    --button-radius: 12px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --spacing: 16px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Arabic', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: block;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* ===== هيكل التطبيق ===== */
+.phone-container {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    background-color: white;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    position: relative;
+    border: none;
+}
+
+.screen {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    background-color: var(--background);
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* ===== الهيدر ===== */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing);
+    background-color: white;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.logo-text h1 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.logo-text p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #3B82F6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* ===== المحتوى الرئيسي ===== */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing);
+    padding-bottom: 100px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.path-card {
+    border: 2px solid var(--primary-light);
+}
+
+.path-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.path-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+.badge {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ===== الأزرار ===== */
+.btn {
+    display: block;
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: var(--button-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    margin: 20px 0;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== مرشد رفيق ===== */
+.guide-container {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.guide-card {
+    background: linear-gradient(135deg, #F0F9FF, #E0F2FE);
+    border-radius: 12px;
+    padding: 16px;
+    border-right: 4px solid var(--primary);
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.guide-icon {
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.guide-message {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* ===== الرسالة التحفيزية ===== */
+.motivational-message {
+    background: linear-gradient(135deg, #FEF3C7, #FCD34D);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-right: 4px solid #F59E0B;
+    text-align: center;
+}
+
+.motivational-message p {
+    margin: 8px 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.motivational-message p:first-child {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+/* ===== النوافذ (Modals) ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--primary-light);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.units-list {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.unit-item {
+    padding: 16px;
+    background-color: var(--background);
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.unit-item:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+.unit-item h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.unit-item p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ===== التنقل السفلي ===== */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--inactive);
+    transition: color 0.2s ease;
+    padding: 8px;
+    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+}
+
+.nav-item.active {
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.nav-item i {
+    font-size: 1.3rem;
+}
+
+.nav-item span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* ===== تأثيرات إضافية ===== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== التجاوب ===== */
+@media (max-width: 420px) {
+    :root {
+        --spacing: 12px;
+        --radius: 14px;
+        --button-radius: 10px;
+    }
+
+    .app-header {
+        padding: 10px;
+    }
+
+    .logo-text h1 { font-size: 1rem; }
+    .logo-text p { font-size: 0.75rem; }
+
+    .main-content { padding: 12px; padding-bottom: 110px; }
+
+    .card { padding: 14px; border-radius: 12px; }
+
+    .btn { height: 44px; font-size: 0.95rem; }
+}
+
+@media (min-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background-color: var(--background);
+    }
+    
+    .phone-container {
+        width: 100%;
+        max-width: 420px;
+        height: calc(100vh - 40px);
+        max-height: 900px;
+        border-radius: 24px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        border: none;
+    }
+}
