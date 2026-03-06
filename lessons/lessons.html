@@ -16,7 +16,7 @@
                     <div class="logo-icon">E</div>
                     <div class="logo-text">
                         <h1>الحصص التعليمية</h1>
-                        <p>اختر الوحدة لعرض الحصص</p>
+                        <p id="header-unit-name">اختر الوحدة لعرض الحصص</p>
                     </div>
                 </div>
                 <a href="../home/home.html" class="btn-icon back-btn">
@@ -25,28 +25,12 @@
             </header>
 
             <main class="main-content">
+                <div class="lessons-info-banner">
+                    <p class="banner-text">لديك <strong id="lesson-count">0</strong> حصص في هذه الوحدة</p>
+                    <p class="banner-description">استمتع بالتعلم واختر الحصة التي تريد البدء بها</p>
+                </div>
                 <div class="units-container">
-                    <div class="unit-card" onclick="toggleLessons(this)" data-unit="1">
-                        <div class="unit-header">
-                            <h3><i class="fas fa-book"></i> الوحدة الأولى: أساسيات اللغة</h3>
-                            <span class="unit-status">٣ من ٥ حصص مكتملة</span>
-                        </div>
-                        <div class="unit-lessons" id="unit-1-lessons"></div>
-                    </div>
-                    <div class="unit-card" onclick="toggleLessons(this)" data-unit="2">
-                        <div class="unit-header">
-                            <h3><i class="fas fa-book"></i> الوحدة الثانية: المحادثة اليومية</h3>
-                            <span class="unit-status">مقفلة</span>
-                        </div>
-                        <div class="unit-lessons" id="unit-2-lessons"></div>
-                    </div>
-                    <div class="unit-card" onclick="toggleLessons(this)" data-unit="3">
-                        <div class="unit-header">
-                            <h3><i class="fas fa-book"></i> الوحدة الثالثة: القواعد الأساسية</h3>
-                            <span class="unit-status">مقفلة</span>
-                        </div>
-                        <div class="unit-lessons" id="unit-3-lessons"></div>
-                    </div>
+                    <!-- سيتم توليد وحدات الحصص تلقائياً من app.js -->
                 </div>
             </main>
         </div>
@@ -106,6 +90,6 @@
         </nav>
     </div>
 
-    <script src="./lessons.js"></script>
+    <script type="module" src="./lessons.js"></script>
 </body>
 </html>

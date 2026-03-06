@@ -1,17 +1,4 @@
-// إحصائيات
-const STATS_KEY = 'manaraStats_v1';
-const ALL_CATEGORIES = {
-    'المفردات': { correct: 0, wrong: 0, points: 0 },
-    'الحروف': { correct: 0, wrong: 0, points: 0 },
-    'الأرقام': { correct: 0, wrong: 0, points: 0 },
-    'المحادثة': { correct: 0, wrong: 0, points: 0 },
-    'أسئلة واستفهام': { correct: 0, wrong: 0, points: 0 },
-    'قواعد': { correct: 0, wrong: 0, points: 0 },
-    'المضارع البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المضارع المستمر': { correct: 0, wrong: 0, points: 0 },
-    'الماضي البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المستقبل': { correct: 0, wrong: 0, points: 0 }
-};
+import { STATS_KEY, ALL_CATEGORIES } from '../app.js';
 
 let statsStore = loadStatsFromStorage();
 
@@ -141,3 +128,8 @@ function showMessage(message) {
 document.addEventListener('DOMContentLoaded', function() {
     renderStats();
 });
+
+// expose functions for inline handlers (module scope)
+window.toggleGrammarDetails = toggleGrammarDetails;
+window.resetAllStats = resetAllStats;
+window.showMessage = showMessage;

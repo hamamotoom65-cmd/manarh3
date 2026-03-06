@@ -28,27 +28,31 @@ body {
     color: var(--text-primary);
     line-height: 1.5;
     min-height: 100vh;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0;
+    padding: 20px;
     overflow-x: hidden;
 }
 
 /* ===== هيكل التطبيق ===== */
 .phone-container {
     width: 100%;
-    max-width: 100%;
-    height: 100vh;
+    max-width: 420px;
+    height: 90vh;
+    max-height: 900px;
     background-color: white;
-    border-radius: 0;
-    box-shadow: none;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
     overflow: hidden;
     position: relative;
-    border: none;
 }
 
 .screen {
     display: none;
     height: 100%;
+    width: 100%;
     flex-direction: column;
     background-color: var(--background);
 }
@@ -121,6 +125,25 @@ body {
     overflow-y: auto;
     padding: var(--spacing);
     padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .card {
@@ -134,6 +157,10 @@ body {
 
 .path-card {
     border: 2px solid var(--primary-light);
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .path-header {
@@ -187,15 +214,293 @@ body {
     background-color: #1d4ed8;
 }
 
+.btn-secondary {
+    background-color: var(--primary);
+    color: white;
+    margin-top: 12px;
+    font-size: 0.95rem;
+    height: 44px;
+}
+
+.btn-secondary:hover {
+    background-color: #1d4ed8;
+}
+
 .btn:active {
     transform: scale(0.98);
 }
 
-/* ===== مرشد رفيق ===== */
-.guide-container {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+/* ===== صفحات إضافية ===== */
+
+/* شاشة قائمة الحصص */
+.lessons-info-banner {
+    background: linear-gradient(135deg, #DBEAFE, #E0E7FF);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-right: 4px solid var(--primary);
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.banner-text {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: center;
+}
+
+.banner-text strong {
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.banner-description {
+    margin: 8px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    text-align: center;
+}
+
+.lessons-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lesson-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+}
+
+.lesson-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+}
+
+.lesson-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lesson-card.locked:hover {
+    border-color: transparent;
+    transform: none;
+}
+
+.lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.lesson-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.lesson-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-completed {
+    background-color: #DCFCE7;
+    color: #166534;
+}
+
+.status-current {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.status-locked {
+    background-color: #F3F4F6;
+    color: #6B7280;
+}
+
+.lesson-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.lesson-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* شاشة الحصة الفردية */
+.lesson-video-container {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lesson-video-container iframe {
+    border-radius: 12px;
+}
+
+.lesson-content {
+    padding: 0 var(--spacing);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.question-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+}
+
+.question-text {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--background);
+}
+
+.option-label:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.option-label input[type="radio"] {
+    cursor: pointer;
+}
+
+.lesson-actions {
+    margin-top: 20px;
+}
+
+/* نتيجة الحصة */
+.lesson-result {
+    margin-top: 20px;
+}
+
+.result-card {
+    background: linear-gradient(135deg, #DCFCE7, #F0FDF4);
+    border-radius: 16px;
+    padding: 24px;
+    border-right: 4px solid var(--success);
+    text-align: center;
+}
+
+.result-card h3 {
+    color: var(--success);
+    font-size: 1.3rem;
+    margin: 0 0 12px 0;
+}
+
+.result-card p {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin: 0 0 20px 0;
+    font-weight: 500;
+}
+
+.completion-message {
+    color: var(--primary) !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 20px !important;
+}
+
+.result-card .btn {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.result-card .btn:last-child {
+    margin-bottom: 0;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.btn-icon:hover {
+    background-color: var(--primary-light);
+}
+
+/* انتقالات سلسة بين الشاشات */
+.screen {
+    animation: screenTransition 0.3s ease-out;
+}
+
+@keyframes screenTransition {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .guide-card {
@@ -203,6 +508,10 @@ body {
     border-radius: 12px;
     padding: 16px;
     border-right: 4px solid var(--primary);
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .guide-header {
@@ -228,16 +537,168 @@ body {
     font-size: 0.95rem;
     color: var(--text-primary);
     line-height: 1.5;
+    text-align: center;
 }
 
-/* ===== الرسالة التحفيزية ===== */
-.motivational-message {
-    background: linear-gradient(135deg, #FEF3C7, #FCD34D);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
-    border-right: 4px solid #F59E0B;
+/* ===== المسار التعليمي النشط ===== */
+.new-path-options {
+    background: linear-gradient(135deg, #F0F9FF, #E0E7FF);
+    border-radius: 16px;
+    padding: 24px;
+    border-right: 4px solid var(--primary);
+    margin-top: 20px;
     text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-welcome-text {
+    font-size: 1.1rem;
+    color: var(--primary);
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.new-path-options .btn {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.new-path-options .btn:last-child {
+    margin-bottom: 0;
+}
+
+.active-path-info {
+    background: linear-gradient(135deg, #DBEAFE, #E0E7FF);
+    border-radius: 16px;
+    padding: 24px;
+    border-right: 4px solid var(--primary);
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-info-content {
+    text-align: center;
+}
+
+.path-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.path-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 8px 0 20px 0;
+    text-align: center;
+}
+
+.active-path-info .btn {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.active-path-info .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== مرشد رفيق ===== */
+.guide-container {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ===== تحسينات الواجهة ===== */
+.units-intro {
+    background: linear-gradient(135deg, #F0F9FF, #E0E7FF);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.units-intro p {
+    margin: 8px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+}
+
+.units-intro strong {
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.intro-text {
+    font-size: 0.9rem !important;
+    color: var(--text-secondary) !important;
+    line-height: 1.4;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.modal-units {
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.modal-header-units {
+    background: linear-gradient(135deg, var(--primary), #3B82F6);
+    color: white;
+    border-bottom: none;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.modal-header-units h3 {
+    color: white;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+/* ===== النافذة المحسنة ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.motivational-message {
+    text-align: center;
+    margin: 20px 0;
 }
 
 .motivational-message p {
@@ -276,10 +737,11 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 400px;
+    max-width: 500px;
     max-height: 70vh;
     overflow-y: auto;
     animation: slideUp 0.3s ease;
+    margin: 0 auto;
 }
 
 @keyframes slideUp {
@@ -306,6 +768,7 @@ body {
     margin: 0;
     font-size: 1.2rem;
     color: var(--text-primary);
+    text-align: center;
 }
 
 .modal-close {
@@ -332,6 +795,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
 }
 
 .unit-item {
@@ -350,16 +816,38 @@ body {
     transform: translateY(-2px);
 }
 
+.unit-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .unit-item h4 {
     margin: 0;
     color: var(--text-primary);
     font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 .unit-item p {
-    margin: 4px 0 0 0;
+    margin: 0;
     font-size: 0.85rem;
     color: var(--text-secondary);
+    text-align: center;
+}
+
+.unit-stats {
+    color: var(--primary);
+    font-weight: 600;
+    text-align: center;
+}
+
+.unit-description {
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+    margin-top: 4px;
+    text-align: center;
 }
 
 /* ===== التنقل السفلي ===== */

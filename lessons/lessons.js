@@ -1,214 +1,7 @@
-// بيانات الحصص (كاملة)
-const lessonsData = {
-    1: [
-        { 
-            id: 1, 
-            title: "Introduction to English", 
-            videoUrl: "https://www.youtube.com/embed/K0-bFGfJwmU",
-            questions: [
-                { text: "ما هو الهدف الأساسي من تعلم اللغة الإنجليزية؟", options: ["التواصل العالمي", "كتاب الهاتف", "الموسيقى"], correct: 0, category: "مفردات" },
-                { text: "كم عدد متحدثي اللغة الإنجليزية في العالم؟", options: ["200 مليون", "1 مليار", "500 مليون"], correct: 1, category: "مفردات" }
-            ],
-            status: "completed" 
-        },
-        { 
-            id: 2, 
-            title: "English Alphabet & Pronunciation", 
-            videoUrl: "https://www.youtube.com/embed/2EdHuKBmCvk",
-            questions: [
-                { text: "كم عدد حروف اللغة الإنجليزية؟", options: ["24", "26", "28"], correct: 1, category: "الحروف" },
-                { text: "الحروف المتحركة (Vowels) هي:", options: ["A, E, I, O, U", "B, C, D, F, G", "جميع الحروف"], correct: 0, category: "الحروف" }
-            ],
-            status: "completed" 
-        },
-        { 
-            id: 3, 
-            title: "Basic English Words", 
-            videoUrl: "https://www.youtube.com/embed/U-1r5v6gBZ4",
-            questions: [
-                { text: "كلمة 'Hello' تعني:", options: ["مرحبا", "وداعا", "شكرا"], correct: 0, category: "مفردات" },
-                { text: "كلمة 'Book' تترجم إلى:", options: ["قلم", "كتاب", "ورقة"], correct: 1, category: "مفردات" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 4, 
-            title: "Numbers in English", 
-            videoUrl: "https://www.youtube.com/embed/vB-eDPvAF2s",
-            questions: [
-                { text: "'Five' = ؟", options: ["4", "5", "6"], correct: 1, category: "الأرقام" },
-                { text: "'Ten' = ؟", options: ["8", "9", "10"], correct: 2, category: "الأرقام" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 5, 
-            title: "Colors in English", 
-            videoUrl: "https://www.youtube.com/embed/7R3qo93PZfE",
-            questions: [
-                { text: "'Red' يعني:", options: ["أزرق", "أحمر", "أخضر"], correct: 1, category: "مفردات" },
-                { text: "'Yellow' يعني:", options: ["أسود", "أصفر", "أبيض"], correct: 1, category: "مفردات" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 6, 
-            title: "Days of the Week", 
-            videoUrl: "https://www.youtube.com/embed/DXzUZ6aQvzQ",
-            questions: [
-                { text: "كم يوم في الأسبوع؟", options: ["5", "7", "6"], correct: 1, category: "مفردات" },
-                { text: "'Monday' يعني:", options: ["الثلاثاء", "الاثنين", "الأربعاء"], correct: 1, category: "مفردات" }
-            ],
-            status: "current" 
-        }
-    ],
-    2: [
-        { 
-            id: 1, 
-            title: "Daily Conversations - Part 1", 
-            videoUrl: "https://www.youtube.com/embed/W01N_5S8vU8",
-            questions: [
-                { text: "'How are you?' تعني:", options: ["ماذا اسمك؟", "كيف حالك؟", "أين تسكن؟"], correct: 1, category: "المحادثة" },
-                { text: "الرد على 'How are you?' هو:", options: ["I'm fine, thank you", "My name is...", "I'm happy"], correct: 0, category: "المحادثة" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 2, 
-            title: "Asking Questions", 
-            videoUrl: "https://www.youtube.com/embed/9nWrAL9S5SY",
-            questions: [
-                { text: "'What is your name?' تعني:", options: ["ماذا اسمك؟", "أين أنت؟", "متى ولدت؟"], correct: 0, category: "أسئلة واستفهام" },
-                { text: "الاستفهام يبدأ غالباً ب:", options: ["What, Where, Why", "A, B, C", "The, And, Or"], correct: 0, category: "أسئلة واستفهام" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 3, 
-            title: "Shopping Vocabulary", 
-            videoUrl: "https://www.youtube.com/embed/LnN8HsF_R5E",
-            questions: [
-                { text: "'How much?' تستخدم لـ:", options: ["السؤال عن الثمن", "السؤال عن الموقع", "السؤال عن الوقت"], correct: 0, category: "المفردات" },
-                { text: "'Expensive' تعني:", options: ["رخيص", "غالي", "بسيط"], correct: 1, category: "المفردات" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 4, 
-            title: "Restaurant English", 
-            videoUrl: "https://www.youtube.com/embed/Y8XLbRKbQTc",
-            questions: [
-                { text: "'I'd like to order...' تعني:", options: ["أريد أن أطلب", "أريد أن أدفع", "أريد الحساب"], correct: 0, category: "المحادثة" },
-                { text: "'The bill, please' تعني:", options: ["الماء من فضلك", "الحساب من فضلك", "الطعام من فضلك"], correct: 1, category: "المحادثة" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 5, 
-            title: "Travel Phrases", 
-            videoUrl: "https://www.youtube.com/embed/xHjhZ6i4QJk",
-            questions: [
-                { text: "'Where is the restroom?' تعني:", options: ["أين المحطة؟", "أين الحمام؟", "أين الفندق؟"], correct: 1, category: "المحادثة" },
-                { text: "'I'm lost' تعني:", options: ["أنا متأخر", "أنا ضائع", "أنا مشغول"], correct: 1, category: "المحادثة" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 6, 
-            title: "Phone Conversations", 
-            videoUrl: "https://www.youtube.com/embed/RxqURrAhWQI",
-            questions: [
-                { text: "'Hello, this is...' تستخدم ل:", options: ["التحية الشخصية", "التحية الهاتفية", "التحية الرسمية"], correct: 1, category: "المحادثة" },
-                { text: "'Can I speak to...?' تعني:", options: ["هل تتحدث؟", "هل أستطيع التحدث مع؟", "هل تسمعني؟"], correct: 1, category: "المحادثة" }
-            ],
-            status: "current" 
-        }
-    ],
-    3: [
-        { 
-            id: 1, 
-            title: "Present Simple Tense", 
-            videoUrl: "https://www.youtube.com/embed/Obi-gLJ45YY",
-            questions: [
-                { text: "Present Simple يستخدم ل:", options: ["الأفعال اليومية", "الأحداث المستقبلية", "الأحداث الماضية"], correct: 0, category: "المضارع البسيط" },
-                { text: "صيغة المثنى في Present Simple:", options: ["I go, he goes", "I goes, he go", "I go, he go"], correct: 0, category: "المضارع البسيط" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 2, 
-            title: "Past Simple Tense", 
-            videoUrl: "https://www.youtube.com/embed/BPZR8qyJSh0",
-            questions: [
-                { text: "Past Simple يستخدم ل:", options: ["الأحداث الماضية", "الأفعال اليومية", "المستقبل"], correct: 0, category: "الماضي البسيط" },
-                { text: "الفعل 'went' هو ماضي الفعل:", options: ["go", "went", "going"], correct: 0, category: "الماضي البسيط" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 3, 
-            title: "Future Tense", 
-            videoUrl: "https://www.youtube.com/embed/gO-TzVWBGHU",
-            questions: [
-                { text: "للتحدث عن المستقبل نستخدم:", options: ["will", "did", "was"], correct: 0, category: "المستقبل" },
-                { text: "'I will go' تعني:", options: ["ذهبت", "سأذهب", "أنا ذاهب"], correct: 1, category: "المستقبل" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 4, 
-            title: "Subject-Verb Agreement", 
-            videoUrl: "https://www.youtube.com/embed/b3HO3q8CmFM",
-            questions: [
-                { text: "'He play' صحيحة؟", options: ["نعم", "لا، الصحيح He plays", "لا أعرف"], correct: 1, category: "قواعد" },
-                { text: "'They goes' صحيحة؟", options: ["نعم", "لا، الصحيح They go", "ربما"], correct: 1, category: "قواعد" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 5, 
-            title: "Sentence Structure", 
-            videoUrl: "https://www.youtube.com/embed/eCl-B_LF4F0",
-            questions: [
-                { text: "ترتيب الجملة الإنجليزية:", options: ["فعل + فاعل + مفعول", "فاعل + فعل + مفعول", "مفعول + فاعل + فعل"], correct: 1, category: "قواعد" },
-                { text: "في الجملة 'I like apples' الفاعل هو:", options: ["apples", "I", "like"], correct: 1, category: "قواعد" }
-            ],
-            status: "current" 
-        },
-        { 
-            id: 6, 
-            title: "Common Mistakes", 
-            videoUrl: "https://www.youtube.com/embed/j2bEX3rWE2s",
-            questions: [
-                { text: "الخطأ الشائع 'I am go' يصحح إلى:", options: ["I am going", "I go", "كلاهما صحيح"], correct: 0, category: "قواعد" },
-                { text: "استخدام 'a' vs 'an':", options: ["a + حرف ساكن", "an + حرف متحرك", "كلاهما"], correct: 2, category: "قواعد" }
-            ],
-            status: "current" 
-        }
-    ]
-};
+// lessons.js - منطق صفحة الحصص
 
-// بيانات الامتحانات (للإشارة عند الانتقال)
-const examsData = [
-    { id: 1, title: "Unit 1 Quiz - Basic English", status: "available" },
-    { id: 2, title: "Unit 2 Quiz - Conversations", status: "available" },
-    { id: 3, title: "Unit 3 Quiz - Grammar Basics", status: "locked" }
-];
-
-// إحصائيات
-const STATS_KEY = 'manaraStats_v1';
-const ALL_CATEGORIES = {
-    'المفردات': { correct: 0, wrong: 0, points: 0 },
-    'الحروف': { correct: 0, wrong: 0, points: 0 },
-    'الأرقام': { correct: 0, wrong: 0, points: 0 },
-    'المحادثة': { correct: 0, wrong: 0, points: 0 },
-    'أسئلة واستفهام': { correct: 0, wrong: 0, points: 0 },
-    'قواعد': { correct: 0, wrong: 0, points: 0 },
-    'المضارع البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المضارع المستمر': { correct: 0, wrong: 0, points: 0 },
-    'الماضي البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المستقبل': { correct: 0, wrong: 0, points: 0 }
-};
+// استيراد البيانات من app.js
+import { lessonsData, unitNames, examsData, STATS_KEY, ALL_CATEGORIES } from '../app.js';
 
 let statsStore = loadStatsFromStorage();
 
@@ -271,8 +64,23 @@ let currentUnitId = null;
 let currentLessonId = null;
 let expandedUnit = null;
 
+// تحديث معلومات الوحدة والحصص في الرأس
+function updateUnitInfo() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const unitParam = urlParams.get('unit');
+    
+    if (unitParam && lessonsData[unitParam]) {
+        const unitName = unitNames[unitParam];
+        const lessonsCount = lessonsData[unitParam].length;
+        
+        document.getElementById('header-unit-name').textContent = unitName;
+        document.getElementById('lesson-count').textContent = lessonsCount;
+    }
+}
+
 // تهيئة الصفحة
 document.addEventListener('DOMContentLoaded', function() {
+    updateUnitInfo();
     populateLessons();
     
     // فتح الوحدة الأولى افتراضياً
@@ -303,41 +111,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function populateLessons() {
+    const unitsContainer = document.querySelector('.units-container');
+    if (!unitsContainer) return;
+
+    unitsContainer.innerHTML = '';
+
     for (const unitId in lessonsData) {
-        const lessonsContainer = document.getElementById(`unit-${unitId}-lessons`);
-        if (lessonsContainer) {
-            const lessons = lessonsData[unitId];
-            let lessonsHTML = '';
-            
-            lessons.forEach(lesson => {
-                let questionsText = '';
-                if (lesson.questions && lesson.questions.length > 0) {
-                    questionsText = lesson.questions.map((q, idx) => `${idx + 1}. ${q.text}`).join(' | ');
-                }
-                
-                lessonsHTML += `
-                    <div class="lesson-item" data-lesson="${lesson.id}" onclick="viewLesson(${unitId}, ${lesson.id})">
-                        <div class="lesson-header">
-                            <div class="lesson-title">
-                                <i class="fas fa-video"></i> ${lesson.title}
-                            </div>
-                            <div class="lesson-status status-${lesson.status}">
-                                ${getStatusText(lesson.status)}
-                            </div>
+        const unitLessons = lessonsData[unitId];
+        if (!Array.isArray(unitLessons)) continue;
+
+        const completedCount = unitLessons.filter(l => l.status === 'completed').length;
+        const lockedCount = unitLessons.filter(l => l.status === 'locked').length;
+        const isUnitLocked = lockedCount === unitLessons.length;
+
+        const unitCard = document.createElement('div');
+        unitCard.className = `unit-card ${isUnitLocked ? 'locked' : ''}`;
+        unitCard.setAttribute('data-unit', unitId);
+
+        const statusText = isUnitLocked ? 'مقفلة' : `${completedCount} من ${unitLessons.length} حصص مكتملة`;
+
+        unitCard.innerHTML = `
+            <div class="unit-header">
+                <h3><i class="fas fa-book"></i> ${unitNames[unitId] || 'الوحدة'}</h3>
+                <span class="unit-status">${statusText}</span>
+            </div>
+            <div class="unit-lessons" id="unit-${unitId}-lessons"></div>
+        `;
+
+        unitCard.addEventListener('click', () => toggleLessons(unitCard));
+        unitsContainer.appendChild(unitCard);
+
+        if (isUnitLocked) continue;
+
+        const lessonsContainer = unitCard.querySelector('.unit-lessons');
+        let lessonsHTML = '';
+
+        unitLessons.forEach(lesson => {
+            lessonsHTML += `
+                <div class="lesson-item" data-lesson="${lesson.id}" onclick="viewLesson(${unitId}, ${lesson.id})">
+                    <div class="lesson-header">
+                        <div class="lesson-title">
+                            <i class="fas fa-video"></i> ${lesson.title}
                         </div>
-                        <div class="lesson-details">
-                            <div class="lesson-meta">
-                                <span><i class="fab fa-youtube"></i> يوتيوب</span>
-                                <span><i class="fas fa-question-circle"></i> ${lesson.questions?.length || 0} أسئلة</span>
-                            </div>
-                            ${questionsText ? `<div class="lesson-questions-preview">${questionsText}</div>` : ''}
+                        <div class="lesson-status status-${lesson.status}">
+                            ${getStatusText(lesson.status)}
                         </div>
                     </div>
-                `;
-            });
-            
-            lessonsContainer.innerHTML = lessonsHTML;
-        }
+                    <div class="lesson-details">
+                        <div class="lesson-meta">
+                            <span><i class="fab fa-youtube"></i> يوتيوب</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        lessonsContainer.innerHTML = lessonsHTML;
     }
 }
 
@@ -351,9 +180,14 @@ function getStatusText(status) {
 }
 
 function toggleLessons(unitElement) {
+    if (unitElement.classList.contains('locked')) {
+        // لا نفتح الوحدات المقفلة
+        return;
+    }
+
     const unitId = unitElement.getAttribute('data-unit');
     const lessonsContainer = unitElement.querySelector('.unit-lessons');
-    
+
     if (expandedUnit === unitId) {
         lessonsContainer.classList.remove('expanded');
         expandedUnit = null;
@@ -362,10 +196,10 @@ function toggleLessons(unitElement) {
         document.querySelectorAll('.unit-lessons.expanded').forEach(container => {
             container.classList.remove('expanded');
         });
-        
+
         lessonsContainer.classList.add('expanded');
         expandedUnit = unitId;
-        
+
         document.querySelectorAll('.unit-card').forEach(card => {
             card.querySelector('.unit-status').style.backgroundColor = 'white';
         });
@@ -606,6 +440,14 @@ function showErrorMessage(message) {
     errorContainer.style.display = 'block';
     setTimeout(() => { errorContainer.style.display = 'none'; }, 5000);
 }
+
+// expose functions for inline handlers (this file is loaded as an ES module)
+window.toggleLessons = toggleLessons;
+window.viewLesson = viewLesson;
+window.goBackToLessons = goBackToLessons;
+window.submitLesson = submitLesson;
+window.goToNextLesson = goToNextLesson;
+window.goBackToPath = goBackToPath;
 
 // تفعيل اختيار الخيارات بالنقر على أي مكان في label
 document.addEventListener('pointerdown', function(e) {

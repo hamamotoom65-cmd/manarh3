@@ -1,81 +1,7 @@
-// بيانات الامتحانات (كاملة)
-const examsData = [
-    {
-        id: 1,
-        title: "Unit 1 Quiz - Basic English",
-        questionsCount: 8,
-        duration: "20 دقيقة",
-        description: "اختبار شامل لأساسيات اللغة الإنجليزية من الوحدة الأولى",
-        status: "available",
-        questions: [
-            { text: "كم عدد حروف اللغة الإنجليزية؟", options: ["24", "26", "28"], correct: 1, category: "الحروف" },
-            { text: "الحروف المتحركة تساوي:", options: ["5", "7", "4"], correct: 0, category: "الحروف" },
-            { text: "'Yellow' يعني:", options: ["أزرق", "أصفر", "أحمر"], correct: 1, category: "مفردات" },
-            { text: "'Monday' هو:", options: ["يوم عطلة", "أول أيام الأسبوع", "الاثنين"], correct: 2, category: "مفردات" },
-            { text: "كم يوم في الأسبوع؟", options: ["5", "7", "6"], correct: 1, category: "مفردات" },
-            { text: "'What is your name?' تعني:", options: ["ماذا اسمك؟", "أين أنت؟", "كيف حالك؟"], correct: 0, category: "أسئلة واستفهام" },
-            { text: "'How are you?' تعني:", options: ["كيف حالك؟", "ماذا اسمك؟", "أين تسكن؟"], correct: 0, category: "أسئلة واستفهام" },
-            { text: "'Thank you' تعني:", options: ["من فضلك", "شكراً لك", "معاً"], correct: 1, category: "مفردات" }
-        ]
-    },
-    {
-        id: 2,
-        title: "Unit 2 Quiz - Conversations",
-        questionsCount: 10,
-        duration: "25 دقيقة",
-        description: "اختبار المحادثات اليومية والعبارات الشائعة",
-        status: "available",
-        questions: [
-            { text: "'I'd like to order...' تعني:", options: ["أريد أن أطلب", "أريد أن أدفع", "أريد الرحيل"], correct: 0, category: "المحادثة" },
-            { text: "'The bill, please' تعني:", options: ["الطعام", "الحساب", "الماء"], correct: 1, category: "المحادثة" },
-            { text: "'Where is the restroom?' تعني:", options: ["أين المطعم؟", "أين الحمام؟", "أين الفندق؟"], correct: 1, category: "المحادثة" },
-            { text: "'I'm lost' تعني:", options: ["أنا مشغول", "أنا ضائع", "أنا متأخر"], correct: 1, category: "المحادثة" },
-            { text: "'How much?' تستخدم ل:", options: ["الوقت", "السعر", "الموقع"], correct: 1, category: "المحادثة" },
-            { text: "'Expensive' تعني:", options: ["رخيص", "غالي", "عادي"], correct: 1, category: "المفردات" },
-            { text: "رد مناسب على 'How are you?':", options: ["I'm fine, thank you", "Yes, I am", "No, thank you"], correct: 0, category: "المحادثة" },
-            { text: "'Can I speak to...?' تعني:", options: ["هل تسمعني؟", "هل أستطيع التحدث مع؟", "هل تتحدث الإنجليزية؟"], correct: 1, category: "المحادثة" },
-            { text: "'Sorry, I don't understand' تعني:", options: ["أنا آسف", "آسف، لا أفهم", "لا، شكراً"], correct: 1, category: "المحادثة" },
-            { text: "في المحادثة الهاتفية نقول:", options: ["Hi", "Hello, this is...", "What's up"], correct: 1, category: "المحادثة" }
-        ]
-    },
-    {
-        id: 3,
-        title: "Unit 3 Quiz - Grammar Basics",
-        questionsCount: 12,
-        duration: "30 دقيقة",
-        description: "اختبار القواعد الأساسية والأزمنة في اللغة الإنجليزية",
-        status: "locked",
-        questions: [
-            { text: "Present Simple يستخدم ل:", options: ["الحقائق العامة", "الأفعال الماضية", "المستقبل"], correct: 0, category: "المضارع البسيط" },
-            { text: "في Present Simple، مع 'he' نضيف:", options: ["nothing", "s", "ing"], correct: 1, category: "المضارع البسيط" },
-            { text: "Past Simple يستخدم ل:", options: ["الحاضر", "الماضي", "المستقبل"], correct: 1, category: "الماضي البسيط" },
-            { text: "صيغة الماضي للفعل 'go':", options: ["goed", "went", "going"], correct: 1, category: "الماضي البسيط" },
-            { text: "للتحدث عن المستقبل نستخدم:", options: ["do", "did", "will"], correct: 2, category: "المستقبل" },
-            { text: "'I will go' تعني:", options: ["ذهبت", "سأذهب", "أنا ذاهب"], correct: 1, category: "المستقبل" },
-            { text: "ترتيب الجملة الإنجليزية:", options: ["فعل + فاعل", "فاعل + فعل", "مفعول + فاعل"], correct: 1, category: "قواعد" },
-            { text: "في الجملة 'She likes cats' الفاعل:", options: ["She", "cats", "likes"], correct: 0, category: "قواعد" },
-            { text: "'He play' صحيحة؟", options: ["نعم", "لا، الصحيح He plays", "ربما"], correct: 1, category: "قواعد" },
-            { text: "الخطأ في 'I am go':", options: ["صحيح", "يجب أن يكون I am going", "يجب أن يكون I go"], correct: 1, category: "قواعد" },
-            { text: "استخدام 'a' مع:", options: ["حرف ساكن", "حرف متحرك", "الأرقام"], correct: 0, category: "قواعد" },
-            { text: "استخدام 'an' مع:", options: ["حرف ساكن", "حرف متحرك", "الفعل"], correct: 1, category: "قواعد" }
-        ]
-    }
-];
+// exams.js - منطق صفحة الامتحانات
 
-// إحصائيات
-const STATS_KEY = 'manaraStats_v1';
-const ALL_CATEGORIES = {
-    'المفردات': { correct: 0, wrong: 0, points: 0 },
-    'الحروف': { correct: 0, wrong: 0, points: 0 },
-    'الأرقام': { correct: 0, wrong: 0, points: 0 },
-    'المحادثة': { correct: 0, wrong: 0, points: 0 },
-    'أسئلة واستفهام': { correct: 0, wrong: 0, points: 0 },
-    'قواعد': { correct: 0, wrong: 0, points: 0 },
-    'المضارع البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المضارع المستمر': { correct: 0, wrong: 0, points: 0 },
-    'الماضي البسيط': { correct: 0, wrong: 0, points: 0 },
-    'المستقبل': { correct: 0, wrong: 0, points: 0 }
-};
+// استيراد البيانات والقيم المشتركة من app.js
+import { examsData, STATS_KEY, ALL_CATEGORIES } from '../app.js';
 
 let statsStore = loadStatsFromStorage();
 
@@ -154,7 +80,9 @@ function populateExams() {
     if (!examsContainer) return;
 
     let examsHTML = '';
-    examsData.forEach(exam => {
+    const availableExams = examsData.filter(exam => exam.status !== 'locked');
+
+    availableExams.forEach(exam => {
         examsHTML += `
             <div class="exam-card">
                 <div class="exam-header">
@@ -172,13 +100,13 @@ function populateExams() {
                         </div>
                     </div>
                     <div class="exam-status status-${exam.status}">
-                        ${exam.status === 'available' ? 'متاح' : 'مقفل'}
+                        متاح
                     </div>
                 </div>
                 <div class="exam-description">
                     ${exam.description}
                 </div>
-                <button class="exam-btn" ${exam.status === 'locked' ? 'disabled' : ''} data-exam-id="${exam.id}">
+                <button class="exam-btn" data-exam-id="${exam.id}">
                     <i class="fas fa-play-circle"></i>
                     ابدأ الامتحان
                 </button>
@@ -403,6 +331,11 @@ function showErrorMessage(message) {
     errorContainer.style.display = 'block';
     setTimeout(() => { errorContainer.style.display = 'none'; }, 5000);
 }
+
+// expose functions for inline handlers (this file is loaded as an ES module)
+window.goBackToExams = goBackToExams;
+window.submitExam = submitExam;
+window.startExam = startExam;
 
 // تفعيل اختيار الخيارات بالنقر على أي مكان في label
 document.addEventListener('pointerdown', function(e) {
