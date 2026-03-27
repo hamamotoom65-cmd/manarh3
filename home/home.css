@@ -119,6 +119,33 @@ body {
     font-weight: 600;
 }
 
+/* ===== شاشة عرض الحصة الفردية ===== */
+.lesson-video-container {
+    background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 15px 40px rgba(37, 99, 235, 0.2);
+    padding: 8px;
+    position: relative;
+    height: 52vh;
+    max-height: 520px;
+    min-height: 260px;
+    display: block;
+    margin-bottom: 16px;
+    background-color: #000;
+}
+
+.lesson-video-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    border: none;
+    position: relative;
+    z-index: 1;
+}
+
 /* ===== المحتوى الرئيسي ===== */
 .main-content {
     flex: 1;
@@ -144,15 +171,6 @@ body {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-}
-
-.card {
-    background-color: var(--card-bg);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
 }
 
 .path-card {
@@ -355,24 +373,90 @@ body {
     gap: 4px;
 }
 
-/* شاشة الحصة الفردية */
-.lesson-video-container {
+/* ===== تحسينات حاوية الفيديو ===== */
+.video-header {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: linear-gradient(135deg, #F0F9FF, #E0E7FF);
+    border-radius: 12px;
+    border-right: 4px solid var(--primary);
     width: 100%;
     max-width: 600px;
-    aspect-ratio: 16/9;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
-    align-self: center;
     margin-left: auto;
     margin-right: auto;
 }
 
+.video-header h3 {
+    margin: 0 0 8px 0;
+    color: var(--primary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.video-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.lesson-video-container {
+    background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 15px 40px rgba(37, 99, 235, 0.2);
+    padding: 8px;
+    position: relative;
+    height: 55vh; /* زيادة الارتفاع قليلاً */
+    max-height: 550px;
+    min-height: 280px;
+    display: block;
+    margin-bottom: 16px;
+    background-color: #000;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    /* التأكد من الظهور */
+    visibility: visible;
+    opacity: 1;
+    /* جعلها أكثر بروزاً */
+    border: 3px solid rgba(37, 99, 235, 0.3);
+}
+
 .lesson-video-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    border: none;
+    position: relative;
+    z-index: 1;
+    /* التأكد من الظهور */
+    visibility: visible;
+    opacity: 1;
+}
+
+/* رسالة بديلة عند عدم وجود فيديو */
+.video-fallback-message {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 20px;
     border-radius: 12px;
 }
 
+/* شاشة الحصة الفردية */
 .lesson-content {
     padding: 0 var(--spacing);
     width: 100%;
@@ -427,46 +511,103 @@ body {
     margin-top: 20px;
 }
 
-/* نتيجة الحصة */
+/* نتيجة الحصة - تظهر بنفس نمط بطاقات الحصص */
 .lesson-result {
-    margin-top: 20px;
-}
-
-.result-card {
-    background: linear-gradient(135deg, #DCFCE7, #F0FDF4);
-    border-radius: 16px;
-    padding: 24px;
-    border-right: 4px solid var(--success);
-    text-align: center;
-}
-
-.result-card h3 {
-    color: var(--success);
-    font-size: 1.3rem;
-    margin: 0 0 12px 0;
-}
-
-.result-card p {
-    color: var(--text-primary);
-    font-size: 1rem;
-    margin: 0 0 20px 0;
-    font-weight: 500;
-}
-
-.completion-message {
-    color: var(--primary) !important;
-    font-size: 1.1rem !important;
-    margin-bottom: 20px !important;
-}
-
-.result-card .btn {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    margin-top: 10px;
+    padding: 0 8px;
+}
+
+.lesson-result .lesson-card {
+    width: 100%;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+    background: var(--card-bg);
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+.lesson-result .lesson-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+}
+
+.lesson-result .lesson-header {
     margin-bottom: 12px;
 }
 
-.result-card .btn:last-child {
-    margin-bottom: 0;
+.lesson-result .lesson-meta {
+    margin-top: 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
 }
+
+.lesson-result .lesson-summary-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lesson-result .lesson-summary-actions .btn {
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.exam-summary {
+    background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 24px;
+    border: 2px solid #e0e7ff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.summary-header h4 {
+    font-size: 1.1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 12px 0;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.summary-stat { display: flex; flex-direction: column; align-items: center; padding: 8px; background: white; border-radius: 8px; border: 1px solid #e0e7ff; }
+.summary-stat .stat-label { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
+.summary-stat .stat-value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+.correct-value { color: var(--success); }
+.wrong-value { color: #EF4444; }
+.percent-value { color: var(--primary); }
+.points-value { color: #F59E0B; }
+
+.exam-summary-list { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.exam-summary-item { background: #ffffff; border: 1px solid rgba(16,24,40,0.04); padding: 8px 10px; border-radius: 8px; font-size: 0.95rem; text-align: right; color: var(--text-primary); }
+.exam-summary-item.correct-item { border-left: 4px solid var(--success); }
+.exam-summary-item.wrong-item { border-left: 4px solid #EF4444; }
+
+.lesson-summary-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+@media (max-width: 420px) {
+    .summary-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
 
 .btn-icon {
     width: 40px;
@@ -744,17 +885,6 @@ body {
     margin: 0 auto;
 }
 
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -919,6 +1049,14 @@ body {
     .card { padding: 14px; border-radius: 12px; }
 
     .btn { height: 44px; font-size: 0.95rem; }
+    
+    .completion-message {
+        font-size: 1.1rem !important;
+    }
+    
+    .lesson-result {
+        min-height: 250px;
+    }
 }
 
 @media (min-width: 768px) {
@@ -940,4 +1078,9 @@ body {
         overflow: hidden;
         border: none;
     }
+}
+
+/* ===== مؤقت للتشخيص - يظهر iframe بحد أحمر ===== */
+.lesson-video-container {
+    background-color: #000;
 }

@@ -1,22 +1,18 @@
-import { STATS_KEY, ALL_CATEGORIES } from '../app.js';
+import { ALL_CATEGORIES, loadStats } from '../app.js';
 
-let statsStore = loadStatsFromStorage();
+let statsStore = loadStats();
 
-function loadStatsFromStorage() {
-    try {
-        const raw = localStorage.getItem(STATS_KEY);
-        if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return {
-        totalCorrect: 0,
-        totalWrong: 0,
-        points: 0,
-        byCategory: JSON.parse(JSON.stringify(ALL_CATEGORIES))
-    };
-}
+window.addEventListener('manaraStatsUpdated', (event) => {
+    if (event?.detail?.stats) {
+        statsStore = event.detail.stats;
+    } else {
+        statsStore = loadStats();
+    }
+    renderStats();
+});
 
 function saveStatsToStorage() {
-    try { localStorage.setItem(STATS_KEY, JSON.stringify(statsStore)); } catch (e) {}
+    // التحديث يتم بواسطة app.js عند معالجة النتائج.
 }
 
 function renderStats() {
@@ -88,9 +84,13 @@ function resetAllStats() {
             totalCorrect: 0,
             totalWrong: 0,
             points: 0,
+            completedLessons: 0,
+            examAttempts: 0,
+            examResults: [],
+            averagePerformance: 0,
             byCategory: JSON.parse(JSON.stringify(ALL_CATEGORIES))
         };
-        saveStatsToStorage();
+        try { localStorage.setItem('manaraStats_v1', JSON.stringify(statsStore)); } catch (e) {}
         renderStats();
         showMessage('✅ تم تفريغ جميع الإحصاءات بنجاح!');
     }

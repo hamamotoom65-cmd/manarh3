@@ -1,14 +1,26 @@
-// home.js - منطق الصفحة الرئيسية
+// home.js - إصلاح مشكلة عرض الفيديو بشكل جذري
 
-// استيراد البيانات من app.js
-import { lessonsData, unitNames, saveEducationPath, getSavedEducationPath, startEducationPath } from '../app.js';
+import { fetchAppDataFromServer, lessonsData, unitNames, saveEducationPath, getSavedEducationPath, startEducationPath, submitLessonAnswers, completeLessonInPath } from '../app.js';
 
-// متغيرات الحالة
 let currentUnit = null;
 let currentLesson = null;
 
-// عرض معلومات المسار التعليمي
+// التحقق من البيانات
+function checkDataAvailability() {
+    if (!lessonsData || Object.keys(lessonsData).length === 0) {
+        console.error('❌ lessonsData غير موجود');
+        return false;
+    }
+    if (!unitNames || Object.keys(unitNames).length === 0) {
+        console.error('❌ unitNames غير موجود');
+        return false;
+    }
+    return true;
+}
+
+// عرض المسار
 function displayActivePath() {
+    if (!checkDataAvailability()) return;
     const savedPath = getSavedEducationPath();
     const newPathOptions = document.getElementById('new-path-options');
     const activePathInfo = document.getElementById('active-path-info');
@@ -16,14 +28,11 @@ function displayActivePath() {
     
     if (savedPath) {
         document.getElementById('current-unit-name').textContent = savedPath.unitName;
-        
         if (savedPath.isNew) {
-            // مسار جديد - عرض الخيارات
             newPathOptions.style.display = 'block';
             activePathInfo.style.display = 'none';
             primaryBtn.style.display = 'none';
         } else {
-            // مسار موجود - عرض المسار الحالي
             newPathOptions.style.display = 'none';
             activePathInfo.style.display = 'block';
             primaryBtn.style.display = 'none';
@@ -35,177 +44,245 @@ function displayActivePath() {
     }
 }
 
-// متابعة المسار التعليمي الحالي
+// متابعة المسار
 function continueEducationPath() {
+    if (!checkDataAvailability()) return;
     const savedPath = getSavedEducationPath();
     if (!savedPath) return openUnitSelector();
-
     startEducationPath();
-
-    // افتح الحصة الحالية مباشرةً (بدلاً من مجرد قائمة الحصص)
     const unitLessons = lessonsData[savedPath.unitId] || [];
-    const currentLesson = unitLessons.find(l => l.status === 'current') || unitLessons.find(l => l.status !== 'completed');
-
-    if (currentLesson) {
-        viewLesson(savedPath.unitId, currentLesson.id);
-        return;
+    const currentLessonObj = unitLessons.find(l => l.status === 'current') || unitLessons.find(l => l.status !== 'completed');
+    if (currentLessonObj) {
+        viewLesson(savedPath.unitId, currentLessonObj.id);
+    } else {
+        openLessonsList(savedPath.unitId);
     }
-
-    // إذا لم يتم العثور على حصة حالية، نعرض قائمة الحصص لمراجعتها
-    openLessonsList(savedPath.unitId);
 }
 
-// فتح نافذة اختيار الوحدة
+// فتح نافذة الوحدات
 function openUnitSelector() {
+    if (!checkDataAvailability()) return;
     const unitModal = document.getElementById('unit-modal');
     const unitsList = unitModal.querySelector('.units-list');
     const unitsCountElement = document.getElementById('units-count');
-    
     unitsList.innerHTML = '';
     const totalUnits = Object.keys(lessonsData).length;
     unitsCountElement.textContent = totalUnits;
     
     for (const unitId in lessonsData) {
-        const unitTitle = unitNames[unitId];
+        const unitTitle = unitNames[unitId] || `وحدة ${unitId}`;
         const lessonsCount = lessonsData[unitId].length;
         const completedStatus = lessonsData[unitId].filter(l => l.status === 'completed').length;
-        
         const unitItem = document.createElement('div');
         unitItem.className = 'unit-item';
         unitItem.innerHTML = `
             <div class="unit-item-content">
                 <h4>🎓 ${unitTitle}</h4>
                 <p class="unit-stats">${lessonsCount} حصص | ✅ ${completedStatus} مكتملة</p>
-                <p class="unit-description">ابدأ تعلمك الآن واكتسب مهارات جديدة</p>
+                <p class="unit-description">ابدأ تعلمك الآن</p>
             </div>
         `;
-        
         unitItem.addEventListener('click', () => {
             closeUnitModal();
             saveEducationPath(unitId);
             openLessonsList(unitId);
         });
-        
         unitsList.appendChild(unitItem);
     }
-    
     unitModal.classList.add('active');
 }
 
 // فتح قائمة الحصص
 function openLessonsList(unitId) {
+    if (!checkDataAvailability()) return;
     currentUnit = parseInt(unitId);
-
+    console.log('📋 فتح قائمة الحصص للوحدة:', currentUnit);
     const lessonsList = document.getElementById('lessons-grid');
-    
-    document.getElementById('lessons-unit-name').textContent = unitNames[unitId];
-    document.getElementById('lessons-count').textContent = lessonsData[unitId].length;
-    
+    document.getElementById('lessons-unit-name').textContent = unitNames[unitId] || `وحدة ${unitId}`;
+    document.getElementById('lessons-count').textContent = lessonsData[unitId]?.length || 0;
     lessonsList.innerHTML = '';
     
-    const availableLessons = lessonsData[unitId].filter(l => l.status !== 'locked');
-
-    if (availableLessons.length === 0) {
-        lessonsList.innerHTML = `<div class="no-lessons-message">لا توجد حصص متاحة في هذه الوحدة حالياً.</div>`;
+    const unitLessons = lessonsData[unitId];
+    if (!unitLessons || unitLessons.length === 0) {
+        lessonsList.innerHTML = `<div class="no-lessons-message">لا توجد حصص</div>`;
+        switchScreen('lessons-list-screen');
         return;
     }
-
+    const availableLessons = unitLessons.filter(l => l.status !== 'locked');
+    if (availableLessons.length === 0) {
+        lessonsList.innerHTML = `<div class="no-lessons-message">جميع الحصص مقفلة</div>`;
+        switchScreen('lessons-list-screen');
+        return;
+    }
     availableLessons.forEach(lesson => {
         const lessonCard = document.createElement('div');
         lessonCard.className = 'lesson-card';
-
         let statusText = '';
-        if (lesson.status === 'completed') {
-            statusText = '✅ مكتملة';
-        } else if (lesson.status === 'current') {
-            statusText = '📖 حالية';
-        }
-
+        if (lesson.status === 'completed') statusText = '✅ مكتملة';
+        else if (lesson.status === 'current') statusText = '📖 حالية';
         lessonCard.innerHTML = `
             <div class="lesson-header">
-                <div class="lesson-title">
-                    <i class="fas fa-video"></i> ${lesson.title}
-                </div>
-                <div class="lesson-status status-${lesson.status}">${statusText}</div>
+                <div class="lesson-title"><i class="fas fa-video"></i> ${lesson.title || 'بدون عنوان'}</div>
+                <div class="lesson-status status-${lesson.status || 'locked'}">${statusText}</div>
             </div>
-            <div class="lesson-meta">
-                <span><i class="fab fa-youtube"></i> يوتيوب</span>
-            </div>
+            <div class="lesson-meta"><span><i class="fab fa-youtube"></i> يوتيوب</span></div>
         `;
-
         lessonCard.addEventListener('click', () => {
-            // افتح نفس شاشة الحصة الموجودة في lessons.html حتى يظهر الفيديو والشكل الموحد
-            window.location.href = `../lessons/lessons.html?unit=${unitId}&lesson=${lesson.id}`;
+            console.log('🖱️ نقر على الحصة:', lesson.id);
+            viewLesson(unitId, lesson.id);
         });
-
         lessonsList.appendChild(lessonCard);
     });
-
     switchScreen('lessons-list-screen');
 }
 
-// عرض الحصة الفردية (يتم التعامل معها في lessons.html بواسطة query params)
+// ========== عرض الحصة مع الفيديو (مطابق لـ lessons.js) ==========
 function viewLesson(unitId, lessonId) {
-    window.location.href = `../lessons/lessons.html?unit=${unitId}&lesson=${lessonId}`;
+    const lesson = lessonsData[unitId]?.find(l => l.id === lessonId);
+    if (!lesson) {
+        console.error('❌ الحصة غير موجودة:', unitId, lessonId);
+        return;
+    }
+
+    console.log('🎬 عرض الحصة:', lesson.title, 'الفيديو:', lesson.videoUrl);
+
+    currentUnit = unitId;
+    currentLesson = lessonId;
+
+    document.getElementById('lesson-title-header').textContent = lesson.title;
+    document.getElementById('lesson-unit-header').textContent = unitNames[unitId] || `الوحدة ${unitId}`;
+
+    // التأكد من وجود مشغل الفيديو وتحديث src
+    const iframe = document.getElementById('lesson-iframe');
+    if (iframe) {
+        iframe.src = lesson.videoUrl;
+        iframe.style.display = 'block';
+        console.log('✅ تم تحديث مشغل الفيديو:', lesson.videoUrl);
+    } else {
+        console.error('❌ مشغل الفيديو غير موجود');
+    }
+
+    const questionsContainer = document.getElementById('lesson-questions');
+    questionsContainer.innerHTML = '';
+
+    lesson.questions.forEach((question, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        questionCard.id = `lesson-question-${unitId}-${lessonId}-${index}`;
+
+        let optionsHTML = '';
+        question.options.forEach((option, optIndex) => {
+            optionsHTML += `
+                <label class="option-label">
+                    <input type="radio" name="lesson-${unitId}-${lessonId}-question-${index}" value="${optIndex}">
+                    <span>${option}</span>
+                </label>
+            `;
+        });
+
+        questionCard.innerHTML = `
+            <div class="question-title">${index + 1}. ${question.text}</div>
+            <div class="question-options">
+                ${optionsHTML}
+            </div>
+        `;
+
+        questionsContainer.appendChild(questionCard);
+    });
+
+    // إخفاء النتيجة وإظهار الأسئلة
+    document.getElementById('lesson-result').style.display = 'none';
+    document.getElementById('lesson-questions').style.display = 'block';
+    document.querySelector('.lesson-actions').style.display = 'block';
+
+    // التبديل إلى شاشة الحصة
+    switchScreen('lesson-view-screen');
 }
 
 // تسليم الحصة
 function submitLesson() {
-    const lesson = lessonsData[currentUnit].find(l => l.id === currentLesson);
+    const questions = document.querySelectorAll('#lesson-questions .question-card');
+    const lesson = lessonsData[currentUnit]?.find(l => l.id === currentLesson);
     if (!lesson) return;
-    
-    // جمع الإجابات وحساب النتيجة
-    let correctAnswers = 0;
-    lesson.questions.forEach((question, index) => {
-        const selected = document.querySelector(`input[name="q-${currentUnit}-${currentLesson}-${index}"]:checked`);
-        if (selected && parseInt(selected.value) === question.correct) {
-            correctAnswers++;
+
+    let allAnswered = true;
+    questions.forEach((questionCard) => {
+        const radio = questionCard.querySelector('input[type="radio"]:checked');
+        if (!radio) {
+            allAnswered = false;
+            questionCard.style.borderColor = '#FFA500';
+        } else {
+            questionCard.style.borderColor = '';
         }
     });
-    
-    // حفظ الحصة كمكتملة
-    const pathData = getSavedEducationPath();
-    if (pathData && !pathData.completedLessons.includes(currentLesson)) {
-        pathData.completedLessons.push(currentLesson);
-        localStorage.setItem('educationPath', JSON.stringify(pathData));
+
+    if (!allAnswered) {
+        showErrorMessage('⚠️ يجب الإجابة على جميع الأسئلة قبل التسليم!');
+        return;
     }
-    
-    // تحديث حالة الحصة
+
+    const selectedAnswers = [];
+    if (lesson.questions) {
+        lesson.questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="lesson-${currentUnit}-${currentLesson}-question-${idx}"]:checked`);
+            selectedAnswers[idx] = selected ? selected.value : undefined;
+        });
+    }
+
+    const evaluation = submitLessonAnswers(currentUnit, currentLesson, selectedAnswers);
+    if (evaluation.error) {
+        showErrorMessage('حدث خطأ أثناء حفظ الإجابات. الرجاء المحاولة مرة أخرى.');
+        return;
+    }
+
+    const correct = evaluation.correct;
+    const totalQuestions = evaluation.total;
+    const results = evaluation.results;
+    const sessionPoints = evaluation.points || 0;
+
+    completeLessonInPath(currentUnit, currentLesson);
     lesson.status = 'completed';
-    
-    // إيجاد الحصة التالية
+
     const lessons = lessonsData[currentUnit];
     const currentIndex = lessons.findIndex(l => l.id === currentLesson);
-    
-    // إخفاء الأسئلة وعرض النتيجة
+
     document.getElementById('lesson-questions').style.display = 'none';
     document.querySelector('.lesson-actions').style.display = 'none';
-    
-    const resultDiv = document.getElementById('lesson-result');
-    resultDiv.style.display = 'block';
-    
-    document.getElementById('result-title').textContent = '✅ تم تسليم الحصة بنجاح!';
-    document.getElementById('result-message').textContent = `أجبت بشكل صحيح على ${correctAnswers} من ${lesson.questions.length} أسئلة`;
-    
-    if (currentIndex < lessons.length - 1) {
-        // توجد حصة تالية
-        document.getElementById('next-lesson-button').style.display = 'block';
-        document.getElementById('completed-button').style.display = 'none';
-    } else {
-        // وصلنا لآخر حصة
-        document.getElementById('next-lesson-button').style.display = 'none';
-        document.getElementById('completed-button').style.display = 'block';
-    }
+
+    displayLessonSummary(correct, totalQuestions, results, currentIndex < lessons.length - 1, sessionPoints);
 }
 
-// الذهاب للحصة التالية
+function displayLessonSummary(correct, totalQuestions, results, hasNextLesson, sessionPoints = 0) {
+    const percentage = (correct / (totalQuestions || 1)) * 100;
+    const lessonResult = document.getElementById('lesson-result');
+    lessonResult.innerHTML = `
+        <div class="exam-summary">
+            <div class="summary-header">
+                <h4><i class="fas fa-list"></i> ملخص الحصة</h4>
+            </div>
+            <div class="summary-stats">
+                <div class="summary-stat"><span class="stat-label">صحيح:</span><span class="stat-value correct-value">${correct}</span></div>
+                <div class="summary-stat"><span class="stat-label">خاطئ:</span><span class="stat-value wrong-value">${totalQuestions - correct}</span></div>
+                <div class="summary-stat"><span class="stat-label">النسبة:</span><span class="stat-value percent-value">${percentage.toFixed(0)}%</span></div>
+                <div class="summary-stat"><span class="stat-label">نقاط:</span><span class="stat-value points-value">${sessionPoints}</span></div>
+            </div>
+            <div class="exam-summary-list">
+                ${results.map(r => `<div class="exam-summary-item ${r.isCorrect ? 'correct-item' : 'wrong-item'}">${r.isCorrect ? `السؤال ${r.idx +1}: صح` : `السؤال ${r.idx +1}: الإجابة الصحيحة: ${r.correctAnswer}`}</div>`).join('')}
+            </div>
+            <div class="lesson-summary-actions">
+                <button class="btn btn-secondary" onclick="goBackToLessonsList()"><i class="fas fa-list"></i> قائمة الحصص</button>
+                ${hasNextLesson ? '<button class="btn btn-primary" onclick="goToNextLesson()"><i class="fas fa-arrow-left"></i> الذهاب للحصة التالية</button>' : '<button class="btn btn-primary" onclick="goBackToPath()"><i class="fas fa-home"></i> العودة للمسار</button>'}
+            </div>
+        </div>
+    `;
+    lessonResult.style.display = 'block';
+}
+
 function goToNextLesson() {
     const lessons = lessonsData[currentUnit];
     const currentIndex = lessons.findIndex(l => l.id === currentLesson);
-    
     if (currentIndex < lessons.length - 1) {
-        const nextLesson = lessons[currentIndex + 1];
-        viewLesson(currentUnit, nextLesson.id);
+        viewLesson(currentUnit, lessons[currentIndex + 1].id);
     }
 }
 
@@ -215,64 +292,106 @@ function switchScreen(screenId) {
     if (lessonViewScreen && lessonViewScreen.classList.contains('active') && screenId !== 'lesson-view-screen') {
         resetLessonView();
     }
-
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    const target = document.getElementById(screenId);
+    if (target) target.classList.add('active');
+    else console.error('❌ شاشة غير موجودة:', screenId);
 }
 
-// إعادة ضبط عرض الحصة (وقف الفيديو وتنظيف العنوان)
+// إعادة تعيين شاشة الحصة (محسّنة)
 function resetLessonView() {
-    currentLesson = null;
-
     const iframe = document.getElementById('lesson-iframe');
     if (iframe) {
-        // إزالة الرابط من iframe لإيقاف تشغيل الفيديو فوراً
         iframe.src = 'about:blank';
-        iframe.removeAttribute('src');
+        iframe.style.display = 'block';
     }
 
-    const titleHeader = document.getElementById('lesson-title-header');
-    if (titleHeader) {
-        titleHeader.textContent = 'الحصة';
+    const container = document.querySelector('.lesson-video-container');
+    if (container) {
+        const msg = container.querySelector('.video-fallback-message');
+        if (msg) msg.remove();
     }
-    const unitHeader = document.getElementById('lesson-unit-header');
-    if (unitHeader) {
-        unitHeader.textContent = 'الوحدة';
+
+    // إعادة تعيين العناوين
+    document.getElementById('lesson-title-header').textContent = 'الحصة';
+    document.getElementById('lesson-unit-header').textContent = 'الوحدة';
+
+    // إخفاء النتائج والأسئلة
+    const resultDiv = document.getElementById('lesson-result');
+    const questionsDiv = document.getElementById('lesson-questions');
+    const actionsDiv = document.querySelector('.lesson-actions');
+
+    if (resultDiv) resultDiv.style.display = 'none';
+    if (questionsDiv) {
+        questionsDiv.style.display = 'block';
+        questionsDiv.innerHTML = '';
     }
+    if (actionsDiv) actionsDiv.style.display = 'block';
 }
 
-// العودة للشاشة الرئيسية
 function goBackToPath() {
     resetLessonView();
     switchScreen('path-screen');
     displayActivePath();
 }
 
-// العودة لقائمة الحصص
 function goBackToLessonsList() {
     resetLessonView();
-    openLessonsList(currentUnit);
+    if (currentUnit !== null) openLessonsList(currentUnit);
+    else goBackToPath();
 }
 
-// إغلاق نافذة اختيار الوحدة
 function closeUnitModal() {
     document.getElementById('unit-modal').classList.remove('active');
 }
 
-// إغلاق النافذة عند النقر خارج المحتوى
-window.addEventListener('click', function(e) {
+window.addEventListener('click', (e) => {
     const modal = document.getElementById('unit-modal');
-    if (e.target === modal) {
-        closeUnitModal();
-    }
+    if (e.target === modal) closeUnitModal();
 });
 
-// تحميل آخر تقدم عند بدء الصفحة
-document.addEventListener('DOMContentLoaded', function() {
+// إعادة محاولة تحميل الفيديو
+function retryVideoLoad() {
+    console.log('🔄 إعادة محاولة تحميل الفيديو...');
+    viewLesson(currentUnit, currentLesson);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 الصفحة الرئيسية جاهزة');
+    await fetchAppDataFromServer();
     displayActivePath();
 });
 
-// expose functions for inline handlers (this file is loaded as an ES module)
+function showErrorMessage(message) {
+    let errorContainer = document.getElementById('error-message-container');
+    if (!errorContainer) {
+        errorContainer = document.createElement('div');
+        errorContainer.id = 'error-message-container';
+        errorContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid #DC2626;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+            font-size: 1rem;
+            text-align: right;
+            z-index: 9999;
+            direction: rtl;
+            font-weight: 500;
+        `;
+        document.body.appendChild(errorContainer);
+    }
+    errorContainer.textContent = message;
+    errorContainer.style.display = 'block';
+    setTimeout(() => { errorContainer.style.display = 'none'; }, 5000);
+}
+
+// تصدير الدوال
 window.openUnitSelector = openUnitSelector;
 window.closeUnitModal = closeUnitModal;
 window.continueEducationPath = continueEducationPath;

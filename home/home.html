@@ -135,6 +135,12 @@
             </header>
 
             <main class="main-content">
+                <!-- عنوان مشغل الفيديو -->
+                <div class="video-header">
+                    <h3><i class="fab fa-youtube"></i> فيديو الدرس</h3>
+                    <p>شاهد الفيديو التعليمي لفهم المحتوى بشكل أفضل</p>
+                </div>
+
                 <div class="lesson-video-container">
                     <iframe id="lesson-iframe" width="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
@@ -151,26 +157,7 @@
                     </div>
                     
                     <!-- نتيجة الحصة -->
-                    <div id="lesson-result" class="lesson-result" style="display: none;">
-                        <div class="result-card">
-                            <h3 id="result-title"></h3>
-                            <p id="result-message"></p>
-                            <div id="next-lesson-button" style="display: none;">
-                                <button class="btn btn-primary" onclick="goToNextLesson()">
-                                    <i class="fas fa-arrow-left"></i> الذهاب للحصة التالية
-                                </button>
-                                <button class="btn btn-secondary" onclick="goBackToLessonsList()">
-                                    <i class="fas fa-list"></i> قائمة الحصص
-                                </button>
-                            </div>
-                            <div id="completed-button" style="display: none;">
-                                <p class="completion-message">🎉 تهانينا! لقد أكملت جميع حصص الوحدة</p>
-                                <button class="btn btn-primary" onclick="goBackToPath()">
-                                    <i class="fas fa-home"></i> العودة للمسار
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="lesson-result" class="lesson-result" style="display: none;"></div>
                 </div>
             </main>
         </div>
