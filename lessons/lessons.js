@@ -1,7 +1,63 @@
-// lessons.js - منطق صفحة الحصص (UI فقط)
+// lessons.js - منطق صفحة الحصص
 
 // استيراد البيانات من app.js
-import { fetchAppDataFromServer, lessonsData, unitNames, examsData, submitLessonAnswers } from '../app.js';
+import { lessonsData, unitNames, examsData, STATS_KEY, ALL_CATEGORIES } from '../app.js';
+
+let statsStore = loadStatsFromStorage();
+
+function loadStatsFromStorage() {
+    try {
+        const raw = localStorage.getItem(STATS_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {
+        totalCorrect: 0,
+        totalWrong: 0,
+        points: 0,
+        byCategory: JSON.parse(JSON.stringify(ALL_CATEGORIES))
+    };
+}
+
+function saveStatsToStorage() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(statsStore)); } catch (e) {}
+}
+
+function updateStatsFromResults(results, questionsArray) {
+    if (!Array.isArray(results) || !Array.isArray(questionsArray)) return 0;
+    let sessionCorrect = 0;
+    let sessionWrong = 0;
+    const perCategoryDelta = {};
+
+    results.forEach(r => {
+        const q = questionsArray[r.idx];
+        const category = (q && q.category) ? q.category : 'مفردات';
+        if (!statsStore.byCategory[category]) statsStore.byCategory[category] = { correct: 0, wrong: 0, points: 0 };
+        if (!perCategoryDelta[category]) perCategoryDelta[category] = { correct: 0, wrong: 0 };
+
+        if (r.isCorrect) {
+            sessionCorrect++;
+            statsStore.totalCorrect++;
+            statsStore.byCategory[category].correct++;
+            perCategoryDelta[category].correct++;
+        } else {
+            sessionWrong++;
+            statsStore.totalWrong++;
+            statsStore.byCategory[category].wrong++;
+            perCategoryDelta[category].wrong++;
+        }
+    });
+
+    const sessionPoints = sessionCorrect - sessionWrong;
+    statsStore.points = (statsStore.points || 0) + sessionPoints;
+
+    for (const cat in perCategoryDelta) {
+        const d = perCategoryDelta[cat];
+        statsStore.byCategory[cat].points = (statsStore.byCategory[cat].points || 0) + (d.correct - d.wrong);
+    }
+
+    saveStatsToStorage();
+    return sessionPoints;
+}
 
 // متغيرات الحالة
 let currentUnitId = null;
@@ -223,50 +279,45 @@ function submitLesson() {
         return;
     }
 
-    const selectedAnswers = [];
+    let correct = 0;
+    const results = [];
+
     questions.forEach((questionCard, idx) => {
         const radio = questionCard.querySelector('input[type="radio"]:checked');
-        selectedAnswers[idx] = radio ? radio.value : undefined;
-    });
+        const question = currentLesson.questions[idx];
+        if (!question) return;
 
-    const result = submitLessonAnswers(currentUnitId, currentLessonId, selectedAnswers);
-    if (result.error) {
-        showErrorMessage('حدث خطأ أثناء حفظ الإجابات. الرجاء المحاولة مرة أخرى.');
-        return;
-    }
-
-    const evaluation = result;
-    const correct = evaluation.correct;
-    const totalQuestions = evaluation.total;
-    const results = evaluation.results;
-    const sessionPoints = evaluation.points || 0;
-
-    questions.forEach((questionCard, idx) => {
-        const r = results[idx];
-        if (!r) return;
-
-        if (r.isCorrect) {
-            questionCard.style.borderColor = 'var(--success)';
-            questionCard.style.backgroundColor = 'rgba(34, 197, 94, 0.05)';
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'answer-result-inline correct-inline';
-            resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> الإجابة ${idx + 1}: صح`;
-            questionCard.appendChild(resultDiv);
-        } else {
-            const correctAnswer = r.correctAnswer;
-            questionCard.style.borderColor = '#EF4444';
-            questionCard.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'answer-result-inline wrong-inline';
-            resultDiv.innerHTML = `
+        if (radio) {
+            const selectedAnswer = parseInt(radio.value);
+            const isCorrect = selectedAnswer === question.correct;
+            
+            if (isCorrect) {
+                correct++;
+                results.push({ isCorrect: true, idx });
+                questionCard.style.borderColor = 'var(--success)';
+                questionCard.style.backgroundColor = 'rgba(34, 197, 94, 0.05)';
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'answer-result-inline correct-inline';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> الإجابة ${idx + 1}: صح`;
+                questionCard.appendChild(resultDiv);
+            } else {
+                const correctAnswer = question.options[question.correct];
+                results.push({ isCorrect: false, idx, correctAnswer });
+                questionCard.style.borderColor = '#EF4444';
+                questionCard.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'answer-result-inline wrong-inline';
+                resultDiv.innerHTML = `
                     <div><i class="fas fa-times-circle"></i> الإجابة ${idx + 1}: خطأ</div>
                     <div class="correct-answer-inline">الإجابة الصحيحة: ${correctAnswer}</div>
                 `;
-            questionCard.appendChild(resultDiv);
+                questionCard.appendChild(resultDiv);
+            }
         }
     });
 
-    displayLessonSummary(correct, totalQuestions, results, sessionPoints);
+    const sessionPoints = updateStatsFromResults(results, currentLesson.questions);
+    displayLessonSummary(correct, questions.length, results, sessionPoints);
 }
 
 function displayLessonSummary(correct, totalQuestions, results, sessionPoints) {
@@ -359,20 +410,6 @@ function displayLessonSummary(correct, totalQuestions, results, sessionPoints) {
     const lessonContent = document.getElementById('lesson-questions').parentElement;
     lessonContent.appendChild(summaryContainer);
     summaryContainer.scrollIntoView({ behavior: 'smooth' });
-}
-
-function goToNextLesson() {
-    const lessons = lessonsData[currentUnitId] || [];
-    const currentIndex = lessons.findIndex(l => l.id === currentLessonId);
-    if (currentIndex >= 0 && currentIndex < lessons.length - 1) {
-        viewLesson(currentUnitId, lessons[currentIndex + 1].id);
-    } else {
-        window.location.href = '../home/home.html';
-    }
-}
-
-function goBackToPath() {
-    window.location.href = '../home/home.html';
 }
 
 function showErrorMessage(message) {

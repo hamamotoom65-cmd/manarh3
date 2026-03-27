@@ -1,6 +1,6 @@
 // home.js - إصلاح مشكلة عرض الفيديو بشكل جذري
 
-import { fetchAppDataFromServer, lessonsData, unitNames, saveEducationPath, getSavedEducationPath, startEducationPath, submitLessonAnswers, completeLessonInPath } from '../app.js';
+import { lessonsData, unitNames, saveEducationPath, getSavedEducationPath, startEducationPath } from '../app.js';
 
 let currentUnit = null;
 let currentLesson = null;
@@ -221,26 +221,25 @@ function submitLesson() {
         return;
     }
 
-    const selectedAnswers = [];
+    let correct = 0;
+    const results = [];
     if (lesson.questions) {
         lesson.questions.forEach((q, idx) => {
             const selected = document.querySelector(`input[name="lesson-${currentUnit}-${currentLesson}-question-${idx}"]:checked`);
-            selectedAnswers[idx] = selected ? selected.value : undefined;
+            const selectedValue = selected ? parseInt(selected.value) : -1;
+            const isCorrect = selectedValue === q.correct;
+            if (isCorrect) {
+                correct++;
+            }
+            results.push({ idx, isCorrect, correctAnswer: q.options[q.correct] });
         });
     }
 
-    const evaluation = submitLessonAnswers(currentUnit, currentLesson, selectedAnswers);
-    if (evaluation.error) {
-        showErrorMessage('حدث خطأ أثناء حفظ الإجابات. الرجاء المحاولة مرة أخرى.');
-        return;
+    const pathData = getSavedEducationPath();
+    if (pathData && !pathData.completedLessons.includes(currentLesson)) {
+        pathData.completedLessons.push(currentLesson);
+        localStorage.setItem('educationPath', JSON.stringify(pathData));
     }
-
-    const correct = evaluation.correct;
-    const totalQuestions = evaluation.total;
-    const results = evaluation.results;
-    const sessionPoints = evaluation.points || 0;
-
-    completeLessonInPath(currentUnit, currentLesson);
     lesson.status = 'completed';
 
     const lessons = lessonsData[currentUnit];
@@ -249,10 +248,10 @@ function submitLesson() {
     document.getElementById('lesson-questions').style.display = 'none';
     document.querySelector('.lesson-actions').style.display = 'none';
 
-    displayLessonSummary(correct, totalQuestions, results, currentIndex < lessons.length - 1, sessionPoints);
+    displayLessonSummary(correct, lesson.questions?.length || 0, results, currentIndex < lessons.length - 1);
 }
 
-function displayLessonSummary(correct, totalQuestions, results, hasNextLesson, sessionPoints = 0) {
+function displayLessonSummary(correct, totalQuestions, results, hasNextLesson) {
     const percentage = (correct / (totalQuestions || 1)) * 100;
     const lessonResult = document.getElementById('lesson-result');
     lessonResult.innerHTML = `
@@ -264,7 +263,7 @@ function displayLessonSummary(correct, totalQuestions, results, hasNextLesson, s
                 <div class="summary-stat"><span class="stat-label">صحيح:</span><span class="stat-value correct-value">${correct}</span></div>
                 <div class="summary-stat"><span class="stat-label">خاطئ:</span><span class="stat-value wrong-value">${totalQuestions - correct}</span></div>
                 <div class="summary-stat"><span class="stat-label">النسبة:</span><span class="stat-value percent-value">${percentage.toFixed(0)}%</span></div>
-                <div class="summary-stat"><span class="stat-label">نقاط:</span><span class="stat-value points-value">${sessionPoints}</span></div>
+                <div class="summary-stat"><span class="stat-label">نقاط:</span><span class="stat-value points-value">${correct - (totalQuestions - correct)}</span></div>
             </div>
             <div class="exam-summary-list">
                 ${results.map(r => `<div class="exam-summary-item ${r.isCorrect ? 'correct-item' : 'wrong-item'}">${r.isCorrect ? `السؤال ${r.idx +1}: صح` : `السؤال ${r.idx +1}: الإجابة الصحيحة: ${r.correctAnswer}`}</div>`).join('')}
@@ -356,9 +355,8 @@ function retryVideoLoad() {
     viewLesson(currentUnit, currentLesson);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 الصفحة الرئيسية جاهزة');
-    await fetchAppDataFromServer();
     displayActivePath();
 });
 

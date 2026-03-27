@@ -3,7 +3,7 @@
 // =======================
 // بيانات الحصص (كاملة)
 // =======================
-export let lessonsData = {
+export const lessonsData = {
     1: [
         { 
             id: 1, 
@@ -195,7 +195,7 @@ export let lessonsData = {
 // =======================
 // أسماء الوحدات
 // =======================
-export let unitNames = {
+export const unitNames = {
     1: "الوحدة الأولى: أساسيات اللغة",
     2: "الوحدة الثانية: المحادثة اليومية",
     3: "الوحدة الثالثة: القواعد الأساسية"
@@ -204,7 +204,7 @@ export let unitNames = {
 // =======================
 // بيانات الامتحانات
 // =======================
-export let examsData = [
+export const examsData = [
     {
         id: 1,
         title: "Unit 1 Quiz - Basic English",
@@ -299,17 +299,6 @@ export function startEducationPath() {
     }
 }
 
-export function completeLessonInPath(unitId, lessonId) {
-    const savedPath = getSavedEducationPath();
-    if (!savedPath) return null;
-    if (!Array.isArray(savedPath.completedLessons)) savedPath.completedLessons = [];
-    if (!savedPath.completedLessons.includes(lessonId)) {
-        savedPath.completedLessons.push(lessonId);
-    }
-    localStorage.setItem('educationPath', JSON.stringify(savedPath));
-    return savedPath;
-}
-
 // دالة تقييم الإجابات لحصة
 export function evaluateLessonAnswers(lesson, selectedAnswers) {
     if (!lesson || !Array.isArray(lesson.questions)) {
@@ -368,189 +357,3 @@ export const ALL_CATEGORIES = {
     'الماضي البسيط': { correct: 0, wrong: 0, points: 0 },
     'المستقبل': { correct: 0, wrong: 0, points: 0 }
 };
-
-// دوال احصائيات مشتركة
-export function loadStats() {
-    try {
-        const raw = localStorage.getItem(STATS_KEY);
-        if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return {
-        totalCorrect: 0,
-        totalWrong: 0,
-        points: 0,
-        completedLessons: 0,
-        examAttempts: 0,
-        examResults: [],
-        averagePerformance: 0,
-        byCategory: JSON.parse(JSON.stringify(ALL_CATEGORIES))
-    };
-}
-
-export function saveStats(statsStore) {
-    try { localStorage.setItem(STATS_KEY, JSON.stringify(statsStore)); } catch (e) {}
-}
-
-export function updateStatsFromResults(results, questionsArray, statsStore = null, options = {}) {
-    if (!Array.isArray(results) || !Array.isArray(questionsArray)) return 0;
-    if (!statsStore) {
-        statsStore = loadStats();
-    }
-    let sessionCorrect = 0;
-    let sessionWrong = 0;
-    const perCategoryDelta = {};
-
-    results.forEach(r => {
-        const q = questionsArray[r.idx];
-        const category = (q && q.category) ? q.category : 'المفردات';
-        if (!statsStore.byCategory[category]) statsStore.byCategory[category] = { correct: 0, wrong: 0, points: 0 };
-        if (!perCategoryDelta[category]) perCategoryDelta[category] = { correct: 0, wrong: 0 };
-
-        if (r.isCorrect) {
-            sessionCorrect++;
-            statsStore.totalCorrect++;
-            statsStore.byCategory[category].correct++;
-            perCategoryDelta[category].correct++;
-        } else {
-            sessionWrong++;
-            statsStore.totalWrong++;
-            statsStore.byCategory[category].wrong++;
-            perCategoryDelta[category].wrong++;
-        }
-    });
-
-    const sessionPoints = sessionCorrect - sessionWrong;
-    statsStore.points = (statsStore.points || 0) + sessionPoints;
-    for (const cat in perCategoryDelta) {
-        const d = perCategoryDelta[cat];
-        statsStore.byCategory[cat].points = (statsStore.byCategory[cat].points || 0) + (d.correct - d.wrong);
-    }
-
-    if (options.lessonCompleted) {
-        statsStore.completedLessons = (statsStore.completedLessons || 0) + 1;
-    }
-
-    if (options.examId) {
-        statsStore.examAttempts = (statsStore.examAttempts || 0) + 1;
-        statsStore.examResults = statsStore.examResults || [];
-        statsStore.examResults.push({
-            examId: options.examId,
-            correct: sessionCorrect,
-            wrong: sessionWrong,
-            points: sessionPoints,
-            percentage: questionsArray.length ? (sessionCorrect / questionsArray.length) * 100 : 0,
-            timestamp: new Date().toISOString()
-        });
-    }
-
-    const total = (statsStore.totalCorrect || 0) + (statsStore.totalWrong || 0);
-    statsStore.averagePerformance = total > 0 ? Math.round(((statsStore.totalCorrect || 0) / total) * 100) : 0;
-
-    saveStats(statsStore);
-    window.dispatchEvent(new CustomEvent('manaraStatsUpdated', { detail: { stats: statsStore } }));
-    return sessionPoints;
-}
-
-// دوال التصحيح المركزي (Single Source of Truth)
-export function submitLessonAnswers(unitId, lessonId, selectedAnswers) {
-    const lesson = lessonsData[unitId]?.find(l => l.id === lessonId);
-    if (!lesson) return { error: 'Lesson not found', correct: 0, total: 0, percentage: 0, results: [] };
-
-    const evaluation = evaluateLessonAnswers(lesson, selectedAnswers);
-    const sessionPoints = updateStatsFromResults(evaluation.results, lesson.questions, null, { lessonCompleted: true });
-
-    // تحديث حالة الحصة محلياً (ليس تخزينًا دائمًا؛ يعكس الواجهة الحالية)
-    if (lesson.status !== 'completed') {
-        lesson.status = 'completed';
-    }
-
-    // تخزين النتائج في localStorage للسجل
-    const recordsKey = 'manaraLessonRecords_v1';
-    try {
-        const existing = JSON.parse(localStorage.getItem(recordsKey) || '[]');
-        existing.push({
-            type: 'lesson',
-            unitId,
-            lessonId,
-            timestamp: new Date().toISOString(),
-            correct: evaluation.correct,
-            total: evaluation.total,
-            percentage: evaluation.percentage,
-            points: sessionPoints
-        });
-        localStorage.setItem(recordsKey, JSON.stringify(existing));
-    } catch (e) {
-        console.error('Failed to save lesson record', e);
-    }
-
-    return { ...evaluation, points: sessionPoints, lesson };
-}
-
-export function submitExamAnswers(examId, selectedAnswers) {
-    const exam = examsData.find(e => e.id === examId);
-    if (!exam) return { error: 'Exam not found', correct: 0, total: 0, percentage: 0, results: [] };
-
-    const evaluation = evaluateExamAnswers(exam, selectedAnswers);
-    const sessionPoints = updateStatsFromResults(evaluation.results, exam.questions, null, { examId: examId });
-
-    // تخزين سجل الامتحان
-    const recordsKey = 'manaraExamRecords_v1';
-    try {
-        const existing = JSON.parse(localStorage.getItem(recordsKey) || '[]');
-        existing.push({
-            type: 'exam',
-            examId,
-            timestamp: new Date().toISOString(),
-            correct: evaluation.correct,
-            total: evaluation.total,
-            percentage: evaluation.percentage,
-            points: sessionPoints
-        });
-        localStorage.setItem(recordsKey, JSON.stringify(existing));
-    } catch (e) {
-        console.error('Failed to save exam record', e);
-    }
-
-    return { ...evaluation, points: sessionPoints, exam };
-}
-
-export function getStats() {
-    return loadStats();
-}
-
-export function getLessonByIds(unitId, lessonId) {
-    return lessonsData[unitId]?.find(l => l.id === lessonId) || null;
-}
-
-export function getExamById(examId) {
-    return examsData.find(e => e.id === examId) || null;
-}
-
-export async function fetchAppDataFromServer() {
-    if (typeof window === 'undefined' || typeof fetch === 'undefined') {
-        return { lessonsData, unitNames, examsData };
-    }
-
-    try {
-        const response = await fetch('http://localhost:3000/api/data', {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Server returned status ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.lessonsData) lessonsData = data.lessonsData;
-        if (data.unitNames) unitNames = data.unitNames;
-        if (data.examsData) examsData = data.examsData;
-
-        console.log('✅ تم جلب البيانات من الخادم بنجاح');
-        return { lessonsData, unitNames, examsData };
-    } catch (error) {
-        console.warn('⚠️ فشل جلب البيانات من الخادم، سيتم استخدام البيانات المحلية', error);
-        return { lessonsData, unitNames, examsData };
-    }
-}
-
